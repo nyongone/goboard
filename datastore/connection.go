@@ -9,11 +9,11 @@ import (
 )
 
 func OpenConnection() (*sql.DB, error) {
-	dsn := GetDSN()
+  dsn := GetDSN()
 
-	return sql.Open("mysql", dsn)
+  return sql.Open("mysql", dsn)
 }
 
 func GetDSN() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", config.EnvVar.DBUser, config.EnvVar.DBPass, config.EnvVar.DBHost, config.EnvVar.DBPort, config.EnvVar.DBSchema)
+  return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", config.EnvVar.DBUser, config.EnvVar.DBPass, config.EnvVar.DBHost, config.EnvVar.DBPort, config.EnvVar.DBSchema)
 }

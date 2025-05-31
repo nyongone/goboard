@@ -8,18 +8,18 @@ import (
 )
 
 type Environment struct {
-	DBUser									string
-	DBPass									string
-	DBHost									string
-	DBPort									string
-	DBSchema								string
-	AppEnv									string
-	AppHost									string
-	AppPort									string
-	AppCors									string
-	JWTSecret								string
-	JWTAccessTokenExpires		string
-	JWTRefreshTokenExpires	string
+	DBUser                  string
+	DBPass                  string
+	DBHost                  string
+	DBPort                  string
+	DBSchema                string
+	AppEnv                  string
+	AppHost                 string
+	AppPort                 string
+	AppCors                 string
+	JWTSecret               string
+	JWTAccessTokenExpires   string
+	JWTRefreshTokenExpires  string
 }
 
 var EnvVar *Environment = new(Environment)

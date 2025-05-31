@@ -13,62 +13,62 @@ import (
 )
 
 func AuthMiddleware(db *sql.DB, next http.HandlerFunc) http.HandlerFunc {
-	userRepository := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepository)
+  userRepository := repository.NewUserRepository(db)
+  userService := service.NewUserService(userRepository)
 
-	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+  return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
 
-		authHeader := strings.Split(r.Header.Get("Authorization"), " ")
+    authHeader := strings.Split(r.Header.Get("Authorization"), " ")
 
-		if len(authHeader) == 2 {
-			access_token := authHeader[1]
-			authorized, err := util.ValidateToken(access_token)
-			if !authorized || err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				json.NewEncoder(w).Encode(&model.Response{
-					Code: http.StatusUnauthorized,
-					Message: "UNAUTHORIZED",	
-				})
+    if len(authHeader) == 2 {
+      access_token := authHeader[1]
+      authorized, err := util.ValidateToken(access_token)
+      if !authorized || err != nil {
+        w.WriteHeader(http.StatusUnauthorized)
+        json.NewEncoder(w).Encode(&model.Response{
+          Code: http.StatusUnauthorized,
+          Message: "UNAUTHORIZED",	
+        })
 
-				return
-			}
+        return
+      }
 
-			decoded, err := util.DecodeToken(access_token)
+      decoded, err := util.DecodeToken(access_token)
 
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				json.NewEncoder(w).Encode(&model.Response{
-					Code: http.StatusUnauthorized,
-					Message: "UNAUTHORIZED",	
-				})
+      if err != nil {
+        w.WriteHeader(http.StatusUnauthorized)
+        json.NewEncoder(w).Encode(&model.Response{
+          Code: http.StatusUnauthorized,
+          Message: "UNAUTHORIZED",	
+        })
 
-				return
-			}
+        return
+      }
 
-			user, err := userService.FindOneByEmail(decoded.Email)
+      user, err := userService.FindOneByEmail(decoded.Email)
 
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				json.NewEncoder(w).Encode(&model.Response{
-					Code: http.StatusUnauthorized,
-					Message: "UNAUTHORIZED",	
-				})
+      if err != nil {
+        w.WriteHeader(http.StatusUnauthorized)
+        json.NewEncoder(w).Encode(&model.Response{
+          Code: http.StatusUnauthorized,
+          Message: "UNAUTHORIZED",	
+        })
 
-				return
-			}
+        return
+      }
 
-			r = r.WithContext(context.WithValue(r.Context(), model.UserKey, user))
-			next.ServeHTTP(w, r)
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(&model.Response{
-				Code: http.StatusUnauthorized,
-				Message: "UNAUTHORIZED",	
-			}) 
+      r = r.WithContext(context.WithValue(r.Context(), model.UserKey, user))
+      next.ServeHTTP(w, r)
+    } else {
+      w.WriteHeader(http.StatusUnauthorized)
+      json.NewEncoder(w).Encode(&model.Response{
+        Code: http.StatusUnauthorized,
+        Message: "UNAUTHORIZED",	
+      }) 
 
-			return
-		}
+      return
+    }
 
-	})
+  })
 }

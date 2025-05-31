@@ -6,25 +6,25 @@ import (
 )
 
 type loginService struct {
-	repo model.UserRepository
+  repo model.UserRepository
 }
 
 func NewLoginService(repo model.UserRepository) model.LoginService {
-	return &loginService{repo}
+  return &loginService{repo}
 }
 
 func (ls *loginService) FindOneByEmail(email string) (*model.User, error) {
-	return ls.repo.FindOneByEmail(email)
+  return ls.repo.FindOneByEmail(email)
 }
 
 func (ls *loginService) CreateAccessToken(email string) (string, error) {
-	return util.CreateAccessToken(email)
+  return util.CreateAccessToken(email)
 }
 
 func (ls *loginService) CreateRefreshToken() (string, error) {
-	return util.CreateRefreshToken()
+  return util.CreateRefreshToken()
 }
 
 func (ls *loginService) UpdateRefreshToken(id int, token string) error {
-	return ls.repo.UpdateRefreshToken(id, token)
+  return ls.repo.UpdateRefreshToken(id, token)
 }

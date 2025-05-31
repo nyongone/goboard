@@ -8,84 +8,84 @@ import (
 )
 
 type LoginHandler struct {
-	Service	model.LoginService
+  Service	model.LoginService
 }
 
 func (lh *LoginHandler) Login(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+  w.Header().Set("Content-Type", "application/json")
 
-	var login model.Login
-	if err := json.NewDecoder(r.Body).Decode(&login); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(&model.Response{
-			Code: http.StatusBadRequest,
-			Message: "BAD_REQUEST",
-		})
+  var login model.Login
+  if err := json.NewDecoder(r.Body).Decode(&login); err != nil {
+    w.WriteHeader(http.StatusBadRequest)
+    json.NewEncoder(w).Encode(&model.Response{
+      Code: http.StatusBadRequest,
+      Message: "BAD_REQUEST",
+    })
 
-		return
-	}
+    return
+  }
 
-	user, err := lh.Service.FindOneByEmail(login.Email)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(&model.Response{
-			Code: http.StatusBadRequest,
-			Message: "BAD_REQUEST",
-		})
+  user, err := lh.Service.FindOneByEmail(login.Email)
+  if err != nil {
+    w.WriteHeader(http.StatusBadRequest)
+    json.NewEncoder(w).Encode(&model.Response{
+      Code: http.StatusBadRequest,
+      Message: "BAD_REQUEST",
+    })
 
-		return
-	}
+    return
+  }
 
-	if isAuthorized, err := util.ComparePassword(user.Password, login.Password); !isAuthorized || err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(&model.Response{
-			Code: http.StatusBadRequest,
-			Message: "BAD_REQUEST",
-		})
+  if isAuthorized, err := util.ComparePassword(user.Password, login.Password); !isAuthorized || err != nil {
+    w.WriteHeader(http.StatusBadRequest)
+    json.NewEncoder(w).Encode(&model.Response{
+      Code: http.StatusBadRequest,
+      Message: "BAD_REQUEST",
+    })
 
-		return
-	}
+    return
+  }
 
-	access_token, err := lh.Service.CreateAccessToken(user.Email)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(&model.Response{
-			Code: http.StatusBadRequest,
-			Message: "BAD_REQUEST",
-		})
+  access_token, err := lh.Service.CreateAccessToken(user.Email)
+  if err != nil {
+    w.WriteHeader(http.StatusBadRequest)
+    json.NewEncoder(w).Encode(&model.Response{
+      Code: http.StatusBadRequest,
+      Message: "BAD_REQUEST",
+    })
 
-		return
-	}
+    return
+  }
 
-	refresh_token, err := lh.Service.CreateRefreshToken()
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(&model.Response{
-			Code: http.StatusBadRequest,
-			Message: "BAD_REQUEST",
-		})
+  refresh_token, err := lh.Service.CreateRefreshToken()
+  if err != nil {
+    w.WriteHeader(http.StatusBadRequest)
+    json.NewEncoder(w).Encode(&model.Response{
+      Code: http.StatusBadRequest,
+      Message: "BAD_REQUEST",
+    })
 
-		return
-	}
+    return
+  }
 
-	err = lh.Service.UpdateRefreshToken(user.ID, refresh_token)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(&model.Response{
-			Code: http.StatusBadRequest,
-			Message: "BAD_REQUEST",
-		})
+  err = lh.Service.UpdateRefreshToken(user.ID, refresh_token)
+  if err != nil {
+    w.WriteHeader(http.StatusBadRequest)
+    json.NewEncoder(w).Encode(&model.Response{
+      Code: http.StatusBadRequest,
+      Message: "BAD_REQUEST",
+    })
 
-		return
-	}
+    return
+  }
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(&model.Response{
-		Code: http.StatusOK,
-		Message: "OK",
-		Data: &model.JWT{
-			AccessToken: access_token,
-			RefreshToken: refresh_token,
-		},
-	})
+  w.WriteHeader(http.StatusOK)
+  json.NewEncoder(w).Encode(&model.Response{
+    Code: http.StatusOK,
+    Message: "OK",
+    Data: &model.JWT{
+      AccessToken: access_token,
+      RefreshToken: refresh_token,
+    },
+  })
 }
