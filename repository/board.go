@@ -20,7 +20,7 @@ func (br *boardRepository) FindAll() ([]*model.Board, error) {
   }
   defer rows.Close()
 
-  var boards []*model.Board
+  var boards = []*model.Board{}
   for rows.Next() {
     board := &model.Board{}
     err := rows.Scan(&board.ID, &board.Name, &board.Slug, &board.CreatedAt, &board.UpdatedAt, &board.DeletedAt)

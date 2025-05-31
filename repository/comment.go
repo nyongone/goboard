@@ -47,7 +47,7 @@ func (cr *commentRepository) FindAllByPost(post_id int) ([]*model.CommentRespons
     return nil, err
   }
 
-  var comments []*model.CommentResponse
+  var comments = []*model.CommentResponse{}
   for rows.Next() {
     comment := &model.CommentResponse{}
     author := &model.CommentAuthor{}
@@ -79,7 +79,7 @@ func (cr *commentRepository) FindAllByAuthor(author_id int) ([]*model.CommentRes
     return nil, err
   }
 
-  var comments []*model.CommentResponse
+  var comments = []*model.CommentResponse{}
   for rows.Next() {
     comment := &model.CommentResponse{}
     author := &model.CommentAuthor{}

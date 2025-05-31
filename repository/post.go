@@ -53,7 +53,7 @@ func (pr *postRepository) FindAll() ([]*model.PostResponse, error) {
   }
   defer rows.Close()
 
-  var posts []*model.PostResponse
+  var posts = []*model.PostResponse{}
   for rows.Next() {
     post := &model.PostResponse{}
     board := &model.BoardResponse{}
@@ -87,7 +87,7 @@ func (pr *postRepository) FindAllByBoard(board_id int) ([]*model.PostResponse, e
   }
   defer rows.Close()
 
-  var posts []*model.PostResponse
+  var posts = []*model.PostResponse{}
   for rows.Next() {
     post := &model.PostResponse{}
     board := &model.BoardResponse{}
@@ -121,7 +121,7 @@ func (pr *postRepository) FindAllByAuthor(author_id int) ([]*model.PostResponse,
   }
   defer rows.Close()
 
-  var posts []*model.PostResponse
+  var posts = []*model.PostResponse{}
   for rows.Next() {
     post := &model.PostResponse{}
     board := &model.BoardResponse{}
