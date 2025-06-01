@@ -16,7 +16,9 @@ type Environment struct {
   AppEnv                  string
   AppHost                 string
   AppPort                 string
-  AppCors                 string
+  AppCorsOrigins          string
+  AppCorsHeaders          string
+  AppCorsMethods          string
   JWTSecret               string
   JWTAccessTokenExpires   string
   JWTRefreshTokenExpires  string
@@ -39,7 +41,9 @@ func LoadEnv() {
   EnvVar.AppEnv = os.Getenv("APP_ENV")
   EnvVar.AppHost = os.Getenv("APP_HOST")
   EnvVar.AppPort = os.Getenv("APP_PORT")
-  EnvVar.AppCors = os.Getenv("APP_CORS")
+  EnvVar.AppCorsOrigins = os.Getenv("APP_CORS_ORIGINS")
+  EnvVar.AppCorsHeaders = os.Getenv("APP_CORS_HEADERS")
+  EnvVar.AppCorsMethods = os.Getenv("APP_CORS_METHODS")
   EnvVar.JWTAccessTokenExpires = os.Getenv("JWT_ACCESS_TOKEN_EXPIRES")
   EnvVar.JWTRefreshTokenExpires = os.Getenv("JWT_REFRESH_TOKEN_EXPIRES")
   EnvVar.JWTSecret = os.Getenv("JWT_SECRET")

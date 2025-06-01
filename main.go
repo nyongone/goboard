@@ -85,7 +85,9 @@ func main() {
   http.Handle("/", r)
 
   c := cors.New(cors.Options{
-    AllowedOrigins: strings.Split(config.EnvVar.AppCors, ","),
+    AllowedHeaders: strings.Split(config.EnvVar.AppCorsHeaders, ","),
+    AllowedMethods: strings.Split(config.EnvVar.AppCorsMethods, ","),
+    AllowedOrigins: strings.Split(config.EnvVar.AppCorsOrigins, ","),
     AllowCredentials: true,
   })
 
@@ -93,6 +95,9 @@ func main() {
 
   logger.Info("Server running...", 
               zap.String("host", config.EnvVar.AppHost),
-              zap.String("port", config.EnvVar.AppPort))
+              zap.String("port", config.EnvVar.AppPort),
+              zap.String("cors_headers", config.EnvVar.AppCorsHeaders),
+              zap.String("cors_methods", config.EnvVar.AppCorsMethods),
+              zap.String("cors_origins", config.EnvVar.AppCorsOrigins))
   http.ListenAndServe(fmt.Sprintf("%s:%s", config.EnvVar.AppHost, config.EnvVar.AppPort), handler)
 }
