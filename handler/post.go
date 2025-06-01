@@ -121,6 +121,9 @@ func (ph *PostHandler) WritePost(w http.ResponseWriter, r *http.Request) {
     return
   }
 
+  authUser := r.Context().Value(model.UserKey).(*model.User)
+  post.AuthorID = authUser.ID
+
   err := ph.Service.Create(&post)
   if err != nil {
     w.WriteHeader(http.StatusBadRequest)
