@@ -29,29 +29,29 @@ func (ps *postService) FindAllByAuthor(author_id int) ([]*model.PostResponse, er
   return ps.repo.FindAllByAuthor(author_id)
 }
 
-func (ps *postService) Create(post *model.Post) error {
+func (ps *postService) Create(post *model.Post) (*int64, error) {
   if len(post.Title) < 5 {
-    return errors.New("length of post's title must be at least 5 characters long")
+    return nil, errors.New("length of post's title must be at least 5 characters long")
   }
 
   if len(post.Content) < 5 {
-    return errors.New("length of post's content must be at least 5 characters long")
+    return nil, errors.New("length of post's content must be at least 5 characters long")
   }
 
   return ps.repo.Create(post)
 }
 
-func (ps *postService) Update(id int, post *model.Post) error {
+func (ps *postService) Update(id int, post *model.Post) (*int64, error) {
   if _, err := ps.repo.FindOne(id); err != nil {
-    return errors.New("post not found")
+    return nil, errors.New("post not found")
   }
 
   if len(post.Title) < 5 {
-    return errors.New("length of post's title must be at least 5 characters long")
+    return nil, errors.New("length of post's title must be at least 5 characters long")
   }
 
   if len(post.Content) < 5 {
-    return errors.New("length of post's content must be at least 5 characters long")
+    return nil, errors.New("length of post's content must be at least 5 characters long")
   }
 
   return ps.repo.Update(id, post)

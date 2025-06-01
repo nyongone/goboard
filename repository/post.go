@@ -140,22 +140,29 @@ func (pr *postRepository) FindAllByAuthor(author_id int) ([]*model.PostResponse,
   return posts, nil
 }
 
-func (pr *postRepository) Create(post *model.Post) error {
-  _, err := pr.db.Exec("INSERT INTO posts (title, content, author_id, board_id) VALUES (?, ?, ?, ?)", &post.Title, &post.Content, &post.AuthorID, &post.BoardID)
+func (pr *postRepository) Create(post *model.Post) (*int64, error) {
+  result, err := pr.db.Exec("INSERT INTO posts (title, content, author_id, board_id) VALUES (?, ?, ?, ?)", &post.Title, &post.Content, &post.AuthorID, &post.BoardID)
   if err != nil {
-    return err
+    return nil, err
   }
 
-  return nil
+  id, err := result.LastInsertId()
+  if err != nil {
+    return nil, err
+  }
+
+  return &id, nil
 }
 
-func (pr *postRepository) Update(id int, post *model.Post) error {
+func (pr *postRepository) Update(id int, post *model.Post) (*int64, error) {
   _, err := pr.db.Exec("UPDATE posts SET title = ?, content = ?, updated_at = NOW() WHERE id = ?", &post.Title, &post.Content, id)
   if err != nil {
-    return err
+    return nil, err
   }
 
-  return nil
+  id64 := int64(id)
+
+  return &id64, nil
 }
 
 func (pr *postRepository) Delete(id int) error {

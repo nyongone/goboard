@@ -34,8 +34,8 @@ type PostRepository interface {
   FindAll() ([]*PostResponse, error)
   FindAllByBoard(board_id int) ([]*PostResponse, error)
   FindAllByAuthor(author_id int) ([]*PostResponse, error)
-  Create(post *Post) error
-  Update(id int, post *Post) error
+  Create(post *Post) (*int64, error)
+  Update(id int, post *Post) (*int64, error)
   Delete(id int) error
   SoftDelete(id int) error
 }
@@ -45,7 +45,7 @@ type PostService interface {
   FindAll() ([]*PostResponse, error)
   FindAllByBoard(board_id int) ([]*PostResponse, error)
   FindAllByAuthor(author_id int) ([]*PostResponse, error)
-  Create(post *Post) error
-  Update(id int, post *Post) error
+  Create(post *Post) (*int64, error)
+  Update(id int, post *Post) (*int64, error)
   Delete(id int, soft_delete bool) error
 }

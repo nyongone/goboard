@@ -124,7 +124,7 @@ func (ph *PostHandler) WritePost(w http.ResponseWriter, r *http.Request) {
   authUser := r.Context().Value(model.UserKey).(*model.User)
   post.AuthorID = authUser.ID
 
-  err := ph.Service.Create(&post)
+  id, err := ph.Service.Create(&post)
   if err != nil {
     w.WriteHeader(http.StatusBadRequest)
     json.NewEncoder(w).Encode(&model.Response{
@@ -139,6 +139,9 @@ func (ph *PostHandler) WritePost(w http.ResponseWriter, r *http.Request) {
   json.NewEncoder(w).Encode(&model.Response{
     Code: http.StatusCreated,
     Message: "CREATED",
+    Data: map[string]*int64{
+      "id": id,
+    },
   })
 }
 
@@ -171,7 +174,7 @@ func (ph *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  err = ph.Service.Update(id, &post)
+  id64, err := ph.Service.Update(id, &post)
   if err != nil {
     w.WriteHeader(http.StatusBadRequest)
     json.NewEncoder(w).Encode(&model.Response{
@@ -186,6 +189,9 @@ func (ph *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
   json.NewEncoder(w).Encode(&model.Response{
     Code: http.StatusOK,
     Message: "OK",
+    Data: map[string]*int64{
+      "id": id64,
+    },
   })
 }
 
