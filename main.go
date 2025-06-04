@@ -28,6 +28,7 @@ func main() {
   if err != nil {
     logger.Fatal("An error occured while connecting mysql database", zap.Error(err))
   }
+  defer db.Close()
 
   // Set max idle/open connections
   idleConns, _ := strconv.Atoi(config.EnvVar.DBMaxIdleConns)
