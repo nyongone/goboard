@@ -13,6 +13,8 @@ type Environment struct {
   DBHost                  string
   DBPort                  string
   DBSchema                string
+  DBMaxIdleConns          string
+  DBMaxOpenConns          string
   AppEnv                  string
   AppHost                 string
   AppPort                 string
@@ -38,6 +40,8 @@ func LoadEnv() {
   EnvVar.DBHost = os.Getenv("DB_HOST")
   EnvVar.DBPort = os.Getenv("DB_PORT")
   EnvVar.DBSchema = os.Getenv("DB_SCHEMA")
+  EnvVar.DBMaxIdleConns = os.Getenv("DB_MAX_IDLE_CONNS")
+  EnvVar.DBMaxOpenConns = os.Getenv("DB_MAX_OPEN_CONNS")
   EnvVar.AppEnv = os.Getenv("APP_ENV")
   EnvVar.AppHost = os.Getenv("APP_HOST")
   EnvVar.AppPort = os.Getenv("APP_PORT")

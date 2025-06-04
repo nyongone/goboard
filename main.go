@@ -10,6 +10,7 @@ import (
 	"go-board-api/repository"
 	"go-board-api/service"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -25,6 +26,13 @@ func main() {
   if err != nil {
     logger.Fatal("An error occured while connecting mysql database", zap.Error(err))
   }
+
+  // Set max idle/open connections
+  idleConns, _ := strconv.Atoi(config.EnvVar.DBMaxIdleConns)
+  maxOpenConns, _ := strconv.Atoi(config.EnvVar.DBMaxOpenConns)
+
+  db.SetMaxIdleConns(idleConns)
+  db.SetMaxOpenConns(maxOpenConns)
 
   r := mux.NewRouter()
   api := r.PathPrefix("/api").Subrouter()
