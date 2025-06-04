@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"go-board-api/config"
@@ -12,8 +13,11 @@ import (
 	"go-board-api/repository"
 	"go-board-api/service"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -26,9 +30,8 @@ func main() {
 
   db, err := datastore.OpenConnection()
   if err != nil {
-    logger.Fatal("An error occured while connecting mysql database", zap.Error(err))
+    logger.Error("An error occured while connecting mysql database", zap.Error(err))
   }
-  defer db.Close()
 
   // Set max idle/open connections
   idleConns, _ := strconv.Atoi(config.EnvVar.DBMaxIdleConns)
@@ -39,7 +42,7 @@ func main() {
 
   err = db.Ping()
   if err != nil {
-    logger.Fatal("An error occured while connecting mysql database", zap.Error(err))
+    logger.Error("An error occured while connecting mysql database", zap.Error(err))
   }
 
   r := mux.NewRouter()
@@ -116,11 +119,58 @@ func main() {
 
   handler := c.Handler(r)
 
-  logger.Info("Server running...", 
-              zap.String("host", config.EnvVar.AppHost),
-              zap.String("port", config.EnvVar.AppPort),
-              zap.String("cors_headers", config.EnvVar.AppCorsHeaders),
-              zap.String("cors_methods", config.EnvVar.AppCorsMethods),
-              zap.String("cors_origins", config.EnvVar.AppCorsOrigins))
-  http.ListenAndServe(fmt.Sprintf("%s:%s", config.EnvVar.AppHost, config.EnvVar.AppPort), handler)
+  // http.ListenAndServe(fmt.Sprintf("%s:%s", config.EnvVar.AppHost, config.EnvVar.AppPort), handler)
+
+  svr := &http.Server{
+    Addr: fmt.Sprintf("%s:%s", config.EnvVar.AppHost, config.EnvVar.AppPort),
+    Handler: handler,
+  }
+
+  go func() {
+    logger.Info("Server running...", 
+                zap.String("host", config.EnvVar.AppHost),
+                zap.String("port", config.EnvVar.AppPort),
+                zap.String("cors_headers", config.EnvVar.AppCorsHeaders),
+                zap.String("cors_methods", config.EnvVar.AppCorsMethods),
+                zap.String("cors_origins", config.EnvVar.AppCorsOrigins))
+
+    if svr.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+      logger.Fatal("An error occured while running server", zap.Error(err))
+    }
+  }()
+
+  stop := GracefulShutdown(func() {
+    logger.Info("Shutting down Server")
+    if err := svr.Shutdown(context.Background()); err != nil {
+      logger.Error("An error occured while shutting down server", zap.Error(err))
+    }
+
+    logger.Info("Close DB Connection")
+    if err := db.Close(); err != nil {
+      logger.Error("An error occured while closing db connection", zap.Error(err))
+    }
+
+    logger.Info("Gracefully Stopped Server")
+  }, syscall.SIGINT, syscall.SIGTERM)
+
+  <-stop
+}
+
+func GracefulShutdown(fn func(), sigs ...os.Signal) <-chan struct{} {
+  stop := make(chan struct{})
+  sigChan := make(chan os.Signal, 1)
+
+  signal.Notify(sigChan, sigs...)
+
+  go func() {
+    <-sigChan
+    signal.Stop(sigChan)
+    
+    fn()
+
+    close(sigChan)
+    close(stop)
+  }()
+
+  return stop
 }
