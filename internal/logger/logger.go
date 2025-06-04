@@ -39,7 +39,7 @@ var DevelopmentEncoderConfig = zapcore.EncoderConfig{
 
 func Init() {
   zapConfig := zap.Config{
-    Level:						zap.NewAtomicLevelAt(zapcore.DebugLevel),
+    Level:						zap.NewAtomicLevelAt(zapcore.InfoLevel),
     Development: 			false,
     Encoding:					"json",
     EncoderConfig: 		ProductionEncoderConfig,
@@ -48,6 +48,7 @@ func Init() {
   }
 
   if config.EnvVar.AppEnv == "development" {
+    zapConfig.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
     zapConfig.Development = true
     zapConfig.EncoderConfig = DevelopmentEncoderConfig
   }
