@@ -1,12 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"go-board-api/config"
 	"go-board-api/datastore"
 	"go-board-api/handler"
 	"go-board-api/internal/logger"
 	"go-board-api/middleware"
+	"go-board-api/model"
 	"go-board-api/repository"
 	"go-board-api/service"
 	"net/http"
@@ -39,6 +41,15 @@ func main() {
   v1 := api.PathPrefix("/v1").Subrouter()
 
   r.Use(middleware.Logger)
+
+  r.HandleFunc("/healthCheck", func(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(&model.Response{
+      Code: http.StatusOK,
+      Message: "OK",
+    })
+  })
 
   userRepository := repository.NewUserRepository(db)
   userService := service.NewUserService(userRepository)
@@ -89,8 +100,6 @@ func main() {
 
   // Login Handlers
   v1.HandleFunc("/login", loginHandler.Login).Methods("POST")
-
-  http.Handle("/", r)
 
   c := cors.New(cors.Options{
     AllowedHeaders: strings.Split(config.EnvVar.AppCorsHeaders, ","),
