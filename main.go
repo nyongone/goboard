@@ -37,6 +37,11 @@ func main() {
   db.SetMaxIdleConns(idleConns)
   db.SetMaxOpenConns(maxOpenConns)
 
+  err = db.Ping()
+  if err != nil {
+    logger.Fatal("An error occured while connecting mysql database", zap.Error(err))
+  }
+
   r := mux.NewRouter()
   api := r.PathPrefix("/api").Subrouter()
   v1 := api.PathPrefix("/v1").Subrouter()
