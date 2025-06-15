@@ -20,10 +20,10 @@ func (uh *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
   id, _ := strconv.Atoi(vars["id"])
   user, err := uh.Service.FindOne(id)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusNotFound)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusNotFound,
+      Message: "NOT_FOUND",
     })
 
     return
@@ -67,10 +67,10 @@ func (uh *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
   err := uh.Service.Update(id, &user)
   if err != nil {
-        w.WriteHeader(http.StatusBadRequest)
+        w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return

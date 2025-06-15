@@ -15,10 +15,10 @@ func (bh *BoardHandler) GetAllBoards(w http.ResponseWriter, r *http.Request) {
 
   boards, err := bh.Service.FindAll()
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return

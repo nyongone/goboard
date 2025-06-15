@@ -42,10 +42,10 @@ func (ph *PostHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 
   posts, err := ph.Service.FindAll()
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
@@ -66,10 +66,10 @@ func (ph *PostHandler) GetAllPostsByBoard(w http.ResponseWriter, r *http.Request
   board_id, _ := strconv.Atoi(vars["board_id"])
   posts, err := ph.Service.FindAllByBoard(board_id)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
@@ -90,10 +90,10 @@ func (ph *PostHandler) GetAllPostsByAuthor(w http.ResponseWriter, r *http.Reques
   author_id, _ := strconv.Atoi(vars["author_id"])
   posts, err := ph.Service.FindAllByAuthor(author_id)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
@@ -126,10 +126,10 @@ func (ph *PostHandler) WritePost(w http.ResponseWriter, r *http.Request) {
 
   id, err := ph.Service.Create(&post)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
@@ -164,11 +164,22 @@ func (ph *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 
   authUser := r.Context().Value(model.UserKey).(*model.User)
   p, err := ph.Service.FindOne(id)
-  if err != nil || p.Author.ID != authUser.ID {
-    w.WriteHeader(http.StatusUnauthorized)
+
+  if err != nil {
+    w.WriteHeader(http.StatusNotFound)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusUnauthorized,
-      Message: "UNAUTHORIZED",
+      Code: http.StatusNotFound,
+      Message: "NOT_FOUND",
+    })
+
+    return
+  }
+
+  if p.Author.ID != authUser.ID {
+    w.WriteHeader(http.StatusForbidden)
+    json.NewEncoder(w).Encode(&model.Response{
+      Code: http.StatusForbidden,
+      Message: "FORBIDDEN",
     })
 
     return
@@ -176,10 +187,10 @@ func (ph *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 
   id64, err := ph.Service.Update(id, &post)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
@@ -203,10 +214,10 @@ func (ph *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
 
   err := ph.Service.Delete(id, true)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return

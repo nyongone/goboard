@@ -44,10 +44,10 @@ func (ch *CommentHandler) GetCommentsByPost(w http.ResponseWriter, r *http.Reque
   id, _ := strconv.Atoi(vars["id"])
   comments, err := ch.Service.FindAllByPost(id)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
@@ -68,10 +68,10 @@ func (ch *CommentHandler) GetCommentByAuthor(w http.ResponseWriter, r *http.Requ
   id, _ := strconv.Atoi(vars["id"])
   comments, err := ch.Service.FindAllByAuthor(id)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
@@ -104,10 +104,10 @@ func (ch *CommentHandler) WriteComment(w http.ResponseWriter, r *http.Request) {
 
   err := ch.Service.Create(&comment)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
@@ -126,24 +126,36 @@ func (ch *CommentHandler) DeleteComment(w http.ResponseWriter, r *http.Request) 
   vars := mux.Vars(r)
   id, _ := strconv.Atoi(vars["id"])
 
-  err := ch.Service.Delete(id, true)
+
+  authUser := r.Context().Value(model.UserKey).(*model.User)
+  c, err := ch.Service.FindOne(id)
+
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusNotFound)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusNotFound,
+      Message: "NOT_FOUND",
     })
 
     return
   }
 
-  authUser := r.Context().Value(model.UserKey).(*model.User)
-  c, err := ch.Service.FindOne(id)
-  if err != nil || c.Author.ID != authUser.ID {
+  if c.Author.ID != authUser.ID {
     w.WriteHeader(http.StatusUnauthorized)
     json.NewEncoder(w).Encode(&model.Response{
       Code: http.StatusUnauthorized,
       Message: "UNAUTHORIZED",
+    })
+
+    return
+  }
+
+  err = ch.Service.Delete(id, true)
+  if err != nil {
+    w.WriteHeader(http.StatusInternalServerError)
+    json.NewEncoder(w).Encode(&model.Response{
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
