@@ -27,20 +27,20 @@ func (lh *LoginHandler) Login(w http.ResponseWriter, r *http.Request) {
 
   user, err := lh.Service.FindOneByEmail(login.Email)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusUnauthorized)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusUnauthorized,
+      Message: "UNAUTHORIZED",
     })
 
     return
   }
 
   if isAuthorized, err := util.ComparePassword(user.Password, login.Password); !isAuthorized || err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusUnauthorized)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusUnauthorized,
+      Message: "UNAUTHORIZED",
     })
 
     return
@@ -48,10 +48,10 @@ func (lh *LoginHandler) Login(w http.ResponseWriter, r *http.Request) {
 
   access_token, err := lh.Service.CreateAccessToken(user.Email)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
@@ -59,10 +59,10 @@ func (lh *LoginHandler) Login(w http.ResponseWriter, r *http.Request) {
 
   refresh_token, err := lh.Service.CreateRefreshToken()
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
@@ -70,10 +70,10 @@ func (lh *LoginHandler) Login(w http.ResponseWriter, r *http.Request) {
 
   err = lh.Service.UpdateRefreshToken(user.ID, refresh_token)
   if err != nil {
-    w.WriteHeader(http.StatusBadRequest)
+    w.WriteHeader(http.StatusInternalServerError)
     json.NewEncoder(w).Encode(&model.Response{
-      Code: http.StatusBadRequest,
-      Message: "BAD_REQUEST",
+      Code: http.StatusInternalServerError,
+      Message: "INTERNAL_SERVER_ERROR",
     })
 
     return
